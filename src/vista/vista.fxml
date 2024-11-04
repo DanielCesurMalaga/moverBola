@@ -9,7 +9,6 @@
       <Pane fx:id="panel" onKeyPressed="#teclaPulsada" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0">
          <children>
             <Circle fx:id="bolaAzul" fill="DODGERBLUE" layoutX="400.0" layoutY="300.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
-            <Circle fx:id="bolaRoja" fill="RED" layoutX="400.0" layoutY="200" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
          </children>
       </Pane>
    </children>
