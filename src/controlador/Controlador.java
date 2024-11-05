@@ -6,6 +6,8 @@ import java.util.ResourceBundle;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -34,7 +36,7 @@ public class Controlador implements Initializable {
             public void handle(long now) {
                 if (pararAzul) {
                     miBola.getBola().setFill(Color.RED);
-                    timer.stop();
+                    moverBola();
                 } else {
                     moverBola();
                 }
@@ -44,7 +46,15 @@ public class Controlador implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        Canvas lienzo = new Canvas(800, 600);
+        GraphicsContext gc = lienzo.getGraphicsContext2D();
+        gc.setFill(Color.WHITE);
+        gc.fillRect(200, 200, 50, 50);
 
+        panel.getChildren().add(lienzo);
+
+        Rectangle obstaculo = new Rectangle(500, 400, 60, 60);
+        panel.getChildren().addAll(obstaculo);
         panel.setFocusTraversable(true);
         panel.setStyle("-fx-background-color: grey");
         miBola = new Bola(bolaAzul);
@@ -87,13 +97,10 @@ public class Controlador implements Initializable {
 
     public boolean colision() {
         capturaPantalla = panel.snapshot(null, null);
-        Color color;
 
         if (miBola.getSentidoX() > 0) { // sentidoY debe ser 0.
-            color = capturaPantalla.getPixelReader().getColor(
-                    (int) miBola.getBola().getLayoutX() + miBola.getSentidoX() + 10,
-                    (int) miBola.getBola().getLayoutY() + miBola.getSentidoY() + 10);
-            if (!(color.equals(Color.GREY)) ||
+
+            if (!(colorIgual()) ||
                     ((miBola.getBola().getLayoutX() + miBola.getSentidoX() + 10) >= 799)) {
                 pararAzul = true;
                 return true;
@@ -101,7 +108,7 @@ public class Controlador implements Initializable {
         } else if (miBola.getSentidoX() < 0) { // sentidoY debe ser 0.
             color = capturaPantalla.getPixelReader().getColor(
                     (int) miBola.getBola().getLayoutX() + miBola.getSentidoX() - 10,
-                    (int) miBola.getBola().getLayoutY() + miBola.getSentidoY() - 10);
+                    (int) miBola.getBola().getLayoutY());
             if (!(color.equals(Color.GREY)) ||
                     ((miBola.getBola().getLayoutX() + miBola.getSentidoX() - 10) <= 1)) {
                 pararAzul = true;
@@ -110,7 +117,7 @@ public class Controlador implements Initializable {
         } else { // sentidoX es 0 implica que se mueve Y.
             if (miBola.getSentidoY() > 0) { // sentidoY debe ser 0.
                 color = capturaPantalla.getPixelReader().getColor(
-                        (int) miBola.getBola().getLayoutX() + miBola.getSentidoX() + 10,
+                        (int) miBola.getBola().getLayoutX(),
                         (int) miBola.getBola().getLayoutY() + miBola.getSentidoY() + 10);
                 if (!(color.equals(Color.GREY)) ||
                         ((miBola.getBola().getLayoutY() + miBola.getSentidoY() + 10) >= 599)) {
@@ -119,7 +126,7 @@ public class Controlador implements Initializable {
                 }
             } else if (miBola.getSentidoY() < 0) { // sentidoY debe ser 0.
                 color = capturaPantalla.getPixelReader().getColor(
-                        (int) miBola.getBola().getLayoutX() + miBola.getSentidoX() - 10,
+                        (int) miBola.getBola().getLayoutX(),
                         (int) miBola.getBola().getLayoutY() + miBola.getSentidoY() - 10);
                 if (!(color.equals(Color.GREY)) ||
                         ((miBola.getBola().getLayoutY() + miBola.getSentidoY() - 10) <= 1)) {
@@ -129,5 +136,34 @@ public class Controlador implements Initializable {
             }
         }
         return false;
+    }
+
+    public boolean colorIgual() {
+        Color color;
+        Color colorU1, colorU2, colorD1, colorD2;
+        color = capturaPantalla.getPixelReader().getColor(
+                (int) miBola.getBola().getLayoutX() + miBola.getSentidoX() + 10,
+                (int) miBola.getBola().getLayoutY());
+
+        colorU1 = capturaPantalla.getPixelReader().getColor(
+                (int) miBola.getBola().getLayoutX(),
+                (int) miBola.getBola().getLayoutY() - 10-1);
+        colorU2 = capturaPantalla.getPixelReader().getColor(
+                (int) (miBola.getBola().getLayoutX() + 10 * Math.cos(45)+1),
+                (int) (miBola.getBola().getLayoutY() - 10 * Math.sin(45)-1));
+
+        colorD1 = capturaPantalla.getPixelReader().getColor(
+                (int) miBola.getBola().getLayoutX(),
+                (int) miBola.getBola().getLayoutY() + 10+1);
+        colorD2 = capturaPantalla.getPixelReader().getColor(
+                (int) (miBola.getBola().getLayoutX() + 10 * Math.cos(45)+1),
+                (int) (miBola.getBola().getLayoutY() + 10 * Math.sin(45)+1));
+
+        return (color.equals(color.GREY) &&
+        colorU1.equals(color.GREY) &&
+        colorU2.equals(color.GREY) &&
+        colorD1.equals(color.GREY) &&
+        colorD2.equals(color.GREY)
+        );
     }
 }
