@@ -44,9 +44,7 @@ public class Controlador implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Rectangle obstaculo = new Rectangle(450, 250, 100, 100);
-        obstaculo.setFill(Color.DARKGREEN);
-        panel.getChildren().addAll(obstaculo);
+
         panel.setFocusTraversable(true);
         panel.setStyle("-fx-background-color: grey");
         miBola = new Bola(bolaAzul);
