@@ -12,7 +12,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-
+import javafx.scene.shape.Rectangle;
 import modelo.Bola;
 
 public class Controlador implements Initializable {
@@ -27,7 +27,7 @@ public class Controlador implements Initializable {
     WritableImage capturaPantalla;
 
     public Controlador() {
-        
+
         pararAzul = false;
         timer = new AnimationTimer() {
             @Override
@@ -44,7 +44,11 @@ public class Controlador implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        Rectangle obstaculo = new Rectangle(450, 250, 100, 100);
+        obstaculo.setFill(Color.DARKGREEN);
+        panel.getChildren().addAll(obstaculo);
         panel.setFocusTraversable(true);
+        panel.setStyle("-fx-background-color: grey");
         miBola = new Bola(bolaAzul);
         timer.start();
 
@@ -85,25 +89,46 @@ public class Controlador implements Initializable {
 
     public boolean colision() {
         capturaPantalla = panel.snapshot(null, null);
-        Color color = capturaPantalla.getPixelReader().getColor(
-            (int)miBola.getBola().getLayoutX() + miBola.getSentidoX() + 10, 
-            (int)miBola.getBola().getLayoutY() + miBola.getSentidoY() + 10
-            );
-        if (((miBola.getBola().getLayoutX() + miBola.getSentidoX() + 10) >= 800)
-                ||
-                ((miBola.getBola().getLayoutX() + miBola.getSentidoX() - 10) <= 0))
-                || 
-                (color == Color.WHITE)
-                )
-                {
-            pararAzul = true;
-            return true;
-        }
-        if (((miBola.getBola().getLayoutY() + miBola.getSentidoY() + 10) >= 600)
-                ||
-                ((miBola.getBola().getLayoutY() + miBola.getSentidoY() - 10) <= 0)) {
-            pararAzul = true;
-            return true;
+        Color color;
+
+        if (miBola.getSentidoX() > 0) { // sentidoY debe ser 0.
+            color = capturaPantalla.getPixelReader().getColor(
+                    (int) miBola.getBola().getLayoutX() + miBola.getSentidoX() + 10,
+                    (int) miBola.getBola().getLayoutY() + miBola.getSentidoY() + 10);
+            if (!(color.equals(Color.GREY)) ||
+                    ((miBola.getBola().getLayoutX() + miBola.getSentidoX() + 10) >= 799)) {
+                pararAzul = true;
+                return true;
+            }
+        } else if (miBola.getSentidoX() < 0) { // sentidoY debe ser 0.
+            color = capturaPantalla.getPixelReader().getColor(
+                    (int) miBola.getBola().getLayoutX() + miBola.getSentidoX() - 10,
+                    (int) miBola.getBola().getLayoutY() + miBola.getSentidoY() - 10);
+            if (!(color.equals(Color.GREY)) ||
+                    ((miBola.getBola().getLayoutX() + miBola.getSentidoX() - 10) <= 1)) {
+                pararAzul = true;
+                return true;
+            }
+        } else { // sentidoX es 0 implica que se mueve Y.
+            if (miBola.getSentidoY() > 0) { // sentidoY debe ser 0.
+                color = capturaPantalla.getPixelReader().getColor(
+                        (int) miBola.getBola().getLayoutX() + miBola.getSentidoX() + 10,
+                        (int) miBola.getBola().getLayoutY() + miBola.getSentidoY() + 10);
+                if (!(color.equals(Color.GREY)) ||
+                        ((miBola.getBola().getLayoutY() + miBola.getSentidoY() + 10) >= 599)) {
+                    pararAzul = true;
+                    return true;
+                }
+            } else if (miBola.getSentidoY() < 0) { // sentidoY debe ser 0.
+                color = capturaPantalla.getPixelReader().getColor(
+                        (int) miBola.getBola().getLayoutX() + miBola.getSentidoX() - 10,
+                        (int) miBola.getBola().getLayoutY() + miBola.getSentidoY() - 10);
+                if (!(color.equals(Color.GREY)) ||
+                        ((miBola.getBola().getLayoutY() + miBola.getSentidoY() - 10) <= 1)) {
+                    pararAzul = true;
+                    return true;
+                }
+            }
         }
         return false;
     }
