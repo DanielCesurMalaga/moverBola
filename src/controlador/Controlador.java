@@ -98,72 +98,134 @@ public class Controlador implements Initializable {
     public boolean colision() {
         capturaPantalla = panel.snapshot(null, null);
 
-        if (miBola.getSentidoX() > 0) { // sentidoY debe ser 0.
-
-            if (!(colorIgual()) ||
-                    ((miBola.getBola().getLayoutX() + miBola.getSentidoX() + 10) >= 799)) {
-                pararAzul = true;
-                return true;
-            }
-        } else if (miBola.getSentidoX() < 0) { // sentidoY debe ser 0.
-            color = capturaPantalla.getPixelReader().getColor(
-                    (int) miBola.getBola().getLayoutX() + miBola.getSentidoX() - 10,
-                    (int) miBola.getBola().getLayoutY());
-            if (!(color.equals(Color.GREY)) ||
-                    ((miBola.getBola().getLayoutX() + miBola.getSentidoX() - 10) <= 1)) {
-                pararAzul = true;
-                return true;
-            }
-        } else { // sentidoX es 0 implica que se mueve Y.
-            if (miBola.getSentidoY() > 0) { // sentidoY debe ser 0.
-                color = capturaPantalla.getPixelReader().getColor(
-                        (int) miBola.getBola().getLayoutX(),
-                        (int) miBola.getBola().getLayoutY() + miBola.getSentidoY() + 10);
-                if (!(color.equals(Color.GREY)) ||
-                        ((miBola.getBola().getLayoutY() + miBola.getSentidoY() + 10) >= 599)) {
-                    pararAzul = true;
-                    return true;
-                }
-            } else if (miBola.getSentidoY() < 0) { // sentidoY debe ser 0.
-                color = capturaPantalla.getPixelReader().getColor(
-                        (int) miBola.getBola().getLayoutX(),
-                        (int) miBola.getBola().getLayoutY() + miBola.getSentidoY() - 10);
-                if (!(color.equals(Color.GREY)) ||
-                        ((miBola.getBola().getLayoutY() + miBola.getSentidoY() - 10) <= 1)) {
-                    pararAzul = true;
-                    return true;
-                }
-            }
+        if (esFrontera(miBola.getBola().getLayoutX(),
+                miBola.getBola().getLayoutY(),
+                miBola.getSentidoX(),
+                miBola.getSentidoY())) {
+            pararAzul = true;
+            return true;
         }
+
+        if (!colorIgual(miBola.getBola().getLayoutX(),
+                miBola.getBola().getLayoutY(),
+                miBola.getSentidoX(),
+                miBola.getSentidoY())) {
+            pararAzul = true;
+            return true;
+        }
+
         return false;
     }
 
-    public boolean colorIgual() {
-        Color color;
-        Color colorU1, colorU2, colorD1, colorD2;
-        color = capturaPantalla.getPixelReader().getColor(
-                (int) miBola.getBola().getLayoutX() + miBola.getSentidoX() + 10,
-                (int) miBola.getBola().getLayoutY());
+    public boolean colorIgual(double centroX, double centroY, double sentidoX, double sentidoY) {
+        Color colorCentro = Color.GREY;
+        Color colorU1 = Color.GREY;
+        Color colorU2 = Color.GREY;
+        Color colorD1 = Color.GREY;
+        Color colorD2 = Color.GREY;
+        // cálculo común
 
-        colorU1 = capturaPantalla.getPixelReader().getColor(
-                (int) miBola.getBola().getLayoutX(),
-                (int) miBola.getBola().getLayoutY() - 10-1);
-        colorU2 = capturaPantalla.getPixelReader().getColor(
-                (int) (miBola.getBola().getLayoutX() + 10 * Math.cos(45)+1),
-                (int) (miBola.getBola().getLayoutY() - 10 * Math.sin(45)-1));
+        if (sentidoX > 0) {
+            colorCentro = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX + 10 * sentidoX + sentidoX),
+                    (int) (centroY + 10 * sentidoY + sentidoY));
+            colorU1 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX),
+                    (int) (centroY - 10 - 1));
+            colorU2 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX + (10 * Math.cos(45)) + 1),
+                    (int) (centroY - (10 * Math.sin(45)) - 1));
+            colorD1 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX),
+                    (int) (centroY + 10 + 1));
+            colorD2 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX + (10 * Math.cos(45)) + 1),
+                    (int) (centroY + (10 * Math.sin(45)) + 1));
 
-        colorD1 = capturaPantalla.getPixelReader().getColor(
-                (int) miBola.getBola().getLayoutX(),
-                (int) miBola.getBola().getLayoutY() + 10+1);
-        colorD2 = capturaPantalla.getPixelReader().getColor(
-                (int) (miBola.getBola().getLayoutX() + 10 * Math.cos(45)+1),
-                (int) (miBola.getBola().getLayoutY() + 10 * Math.sin(45)+1));
+        } else if (sentidoX < 0) {
+            colorCentro = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX + 10 * sentidoX + sentidoX),
+                    (int) (centroY + 10 * sentidoY + sentidoY));
+            colorU1 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX),
+                    (int) (centroY + 10 + 1));
+            colorU2 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX - (10 * Math.cos(45)) - 1),
+                    (int) (centroY - (10 * Math.sin(45)) - 1));
+            colorD1 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX),
+                    (int) (centroY - 10 - 1));
+            colorD2 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX - (10 * Math.cos(45)) - 1),
+                    (int) (centroY + (10 * Math.sin(45)) + 1));
 
-        return (color.equals(color.GREY) &&
-        colorU1.equals(color.GREY) &&
-        colorU2.equals(color.GREY) &&
-        colorD1.equals(color.GREY) &&
-        colorD2.equals(color.GREY)
-        );
+        } else if (sentidoY > 0) {
+            colorCentro = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX + 10 * sentidoX + sentidoX),
+                    (int) (centroY + 10 * sentidoY + sentidoY));
+            colorU1 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX - 10 - 1),
+                    (int) (centroY));
+            colorU2 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX + (10 * Math.cos(45)) + 1),
+                    (int) (centroY + (10 * Math.sin(45)) + 1));
+            colorD1 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX + 10 + 1),
+                    (int) (centroY));
+            colorD2 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX - (10 * Math.cos(45)) - 1),
+                    (int) (centroY + (10 * Math.sin(45)) + 1));
+
+        } else if (sentidoY < 0) {
+            colorCentro = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX + 10 * sentidoX + sentidoX),
+                    (int) (centroY + 10 * sentidoY + sentidoY));
+            colorU1 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX - 10 - 1),
+                    (int) (centroY));
+            colorU2 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX - (10 * Math.cos(45)) - 1),
+                    (int) (centroY - (10 * Math.sin(45)) - 1));
+            colorD1 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX + 10 + 1),
+                    (int) (centroY));
+            colorD2 = capturaPantalla.getPixelReader().getColor(
+                    (int) (centroX + (10 * Math.cos(45)) + 1),
+                    (int) (centroY - (10 * Math.sin(45)) - 1));
+        }
+
+        return (colorCentro.equals(Color.GREY) &&
+                colorU1.equals(Color.GREY) &&
+                colorU2.equals(Color.GREY) &&
+                colorD1.equals(Color.GREY) &&
+                colorD2.equals(Color.GREY));
+    }
+
+    public boolean esFrontera(double centroX, double centroY, double sentidoX, double sentidoY) {
+
+        if (sentidoX > 0) {
+            if ((centroX + 10 + 1) > 799) {
+                return true;
+            }
+            return false;
+        } else if (sentidoX < 0) {
+            if ((centroX - 10 - 1) <= 0) {
+                return true;
+            }
+            return false;
+        }
+
+        if (sentidoY > 0) {
+            if ((centroY + 10 + 1) > 599) {
+                return true;
+            }
+            return false;
+        } else if (sentidoY < 0) {
+            if ((centroY - 10 - 1) <= 0) {
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
 }
